@@ -15,11 +15,17 @@ function NoteEditor() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (!isNewNote) {
-      fetchNote();
-    }
-  }, [id]);
+useEffect(() => {
+  setTitle('');
+  setContent('');
+  setError('');
+  if (isNewNote) {
+    setLoading(false);
+  } else {
+    setLoading(true);
+    fetchNote();
+  }
+}, [id]);
 
   const fetchNote = async () => {
     try {

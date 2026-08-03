@@ -1,3 +1,4 @@
+import DOMPurify from 'dompurify';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -161,8 +162,7 @@ function Dashboard() {
                   </div>
                   <div
                     className={`text-sm ${color.text} opacity-70 line-clamp-4`}
-                    dangerouslySetInnerHTML={{ __html: note.content }}
-                  />
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(note.content) }}/>
                 </div>
               );
             })}
