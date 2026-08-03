@@ -34,6 +34,8 @@ const pinoHttp = require('pino-http');
 const connectDB = require('./config/db');
 const logger = require('./utils/logger');
 const authRoutes = require('./routes/authRoutes');
+const notesRoutes = require('./routes/notesRoutes');
+
 
 const app = express();
 
@@ -44,6 +46,7 @@ app.use(express.json());
 app.use(pinoHttp({ logger }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/notes', notesRoutes);
 
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is running' });

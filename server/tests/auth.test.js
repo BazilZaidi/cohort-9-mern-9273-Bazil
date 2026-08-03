@@ -15,7 +15,7 @@ describe('Auth API', () => {
 
   after(async () => {
     await User.deleteOne({ email: testUser.email });
-    await mongoose.connection.close();
+    // await mongoose.connection.close();
   });
 
   describe('POST /api/auth/signup', () => {
