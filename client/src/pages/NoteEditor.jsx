@@ -33,6 +33,7 @@ useEffect(() => {
       setTitle(note.title);
       setContent(note.content);
     } catch (err) {
+      console.error(err);
       setError('Failed to load note');
     } finally {
       setLoading(false);
@@ -55,6 +56,7 @@ useEffect(() => {
       }
       navigate('/dashboard');
     } catch (err) {
+      console.error(err);
       setError('Failed to save note');
     } finally {
       setSaving(false);
@@ -76,13 +78,13 @@ useEffect(() => {
           {isNewNote ? 'New Note' : 'Edit Note'}
         </h1>
         <div className="flex gap-3">
-          <button
+          <button type="button"
             onClick={() => navigate('/dashboard')}
             className="text-sm font-medium text-gray-600 hover:text-gray-900 border border-gray-300 px-4 py-2 rounded-lg transition-colors"
           >
             Cancel
           </button>
-          <button
+          <button type="button"
             onClick={handleSave}
             disabled={saving}
             className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
