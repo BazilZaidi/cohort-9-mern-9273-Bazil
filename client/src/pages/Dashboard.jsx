@@ -1,6 +1,6 @@
-import DOMPurify from 'dompurify';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify'; 
 import { useAuth } from '../context/AuthContext';
 import { getNotes, deleteNote } from '../services/notesService';
 
@@ -31,6 +31,7 @@ function Dashboard() {
       const data = await getNotes();
       setNotes(data);
     } catch (err) {
+      console.error(err);
       setError('Failed to load notes');
     } finally {
       setLoading(false);
@@ -49,6 +50,7 @@ function Dashboard() {
       await deleteNote(id);
       setNotes(notes.filter((note) => note._id !== id));
     } catch (err) {
+      console.error(err);
       setError('Failed to delete note');
     }
   };
@@ -57,9 +59,64 @@ function Dashboard() {
     note.title.toLowerCase().includes(search.toLowerCase())
   );
 
+  const goToNote = (id) => navigate(`/notes/${id}`);
+
+  let content;
+  if (loading) {
+    content = <p className="text-gray-500 text-sm">Loading notes...</p>;
+  } else if (filteredNotes.length === 0) {
+    content = (
+      <div className="text-center py-20">
+        <p className="text-4xl mb-3">🗒️</p>
+        <p className="text-gray-500">
+          {search ? 'No notes match your search' : 'No notes yet — create your first one!'}
+        </p>
+      </div>
+    );
+  } else {
+    content = (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {filteredNotes.map((note, index) => {
+          const color = CARD_COLORS[index % CARD_COLORS.length];
+          return (
+            <div
+              key={note._id}
+              role="button"
+              tabIndex={0}
+              onClick={() => goToNote(note._id)}
+              onKeyDown={(e) => {
+              if (e.key === 'Enter' && e.target === e.currentTarget) {
+              goToNote(note._id);
+            }     
+            }}
+              className={`${color.bg} rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200`}
+            >
+              <div className="flex justify-between items-start mb-3">
+                <h3 className={`font-bold text-lg ${color.text} truncate pr-2`}>
+                  {note.title}
+                </h3>
+                <button
+                  type="button"
+                  onClick={(e) => handleDelete(note._id, e)}
+                  className={`${color.accent} hover:text-red-600 text-sm shrink-0`}
+                >
+                  ✕
+                </button>
+              </div>
+              {/* 2. Sanitized HTML content before rendering */}
+              <div
+                className={`text-sm ${color.text} opacity-70 line-clamp-4`}
+                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(note.content) }}
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-100 flex flex-col p-5 sticky top-0 h-screen">
         <div className="flex items-center gap-2 mb-8">
           <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center text-white font-bold">
@@ -72,7 +129,10 @@ function Dashboard() {
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
             Main
           </p>
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-100 text-gray-900 font-medium text-sm mb-1">
+          <button
+            type="button"
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-100 text-gray-900 font-medium text-sm mb-1"
+          >
             📄 All Notes
           </button>
         </nav>
@@ -87,6 +147,7 @@ function Dashboard() {
             </span>
           </div>
           <button
+            type="button"
             onClick={handleLogout}
             className="w-full text-sm font-medium text-gray-500 hover:text-gray-900 border border-gray-200 px-3 py-2 rounded-lg transition-colors"
           >
@@ -95,7 +156,6 @@ function Dashboard() {
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 p-8">
         <div className="flex justify-between items-center mb-6 gap-4">
           <div>
@@ -116,6 +176,7 @@ function Dashboard() {
               />
             </div>
             <button
+              type="button"
               onClick={() => navigate('/notes/new')}
               className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm"
             >
@@ -130,44 +191,7 @@ function Dashboard() {
           </p>
         )}
 
-        {loading ? (
-          <p className="text-gray-500 text-sm">Loading notes...</p>
-        ) : filteredNotes.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-4xl mb-3">🗒️</p>
-            <p className="text-gray-500">
-              {search ? 'No notes match your search' : 'No notes yet — create your first one!'}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredNotes.map((note, index) => {
-              const color = CARD_COLORS[index % CARD_COLORS.length];
-              return (
-                <div
-                  key={note._id}
-                  onClick={() => navigate(`/notes/${note._id}`)}
-                  className={`${color.bg} rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200`}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className={`font-bold text-lg ${color.text} truncate pr-2`}>
-                      {note.title}
-                    </h3>
-                    <button
-                      onClick={(e) => handleDelete(note._id, e)}
-                      className={`${color.accent} hover:text-red-600 text-sm shrink-0`}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <div
-                    className={`text-sm ${color.text} opacity-70 line-clamp-4`}
-                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(note.content) }}/>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        {content}
       </main>
     </div>
   );
