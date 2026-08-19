@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DOMPurify from 'dompurify'; 
+import DOMPurify from 'dompurify';
+import { FileText, Pin, Settings, Search, Plus, LogOut, StickyNote } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getNotes, deleteNote } from '../services/notesService';
 
@@ -20,6 +21,7 @@ function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [view, setView] = useState('all'); // 'all' | 'pinned'
 
   useEffect(() => {
     fetchNotes();
@@ -55,9 +57,9 @@ function Dashboard() {
     }
   };
 
-  const filteredNotes = notes.filter((note) =>
-    note.title.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredNotes = notes
+    .filter((note) => note.title.toLowerCase().includes(search.toLowerCase()))
+    .filter((note) => (view === 'pinned' ? note.isPinned : true));
 
   const goToNote = (id) => navigate(`/notes/${id}`);
 
@@ -67,9 +69,13 @@ function Dashboard() {
   } else if (filteredNotes.length === 0) {
     content = (
       <div className="text-center py-20">
-        <p className="text-4xl mb-3">🗒️</p>
+        <StickyNote className="w-10 h-10 text-gray-300 mx-auto mb-3" />
         <p className="text-gray-500">
-          {search ? 'No notes match your search' : 'No notes yet — create your first one!'}
+          {search
+            ? 'No notes match your search'
+            : view === 'pinned'
+            ? 'No pinned notes yet'
+            : 'No notes yet — create your first one!'}
         </p>
       </div>
     );
@@ -85,10 +91,10 @@ function Dashboard() {
               tabIndex={0}
               onClick={() => goToNote(note._id)}
               onKeyDown={(e) => {
-              if (e.key === 'Enter' && e.target === e.currentTarget) {
-              goToNote(note._id);
-            }     
-            }}
+                if (e.key === 'Enter' && e.target === e.currentTarget) {
+                  goToNote(note._id);
+                }
+              }}
               className={`${color.bg} rounded-2xl p-5 cursor-pointer hover:shadow-lg hover:-translate-y-1 transition-all duration-200`}
             >
               <div className="flex justify-between items-start mb-3">
@@ -103,7 +109,6 @@ function Dashboard() {
                   ✕
                 </button>
               </div>
-              {/* 2. Sanitized HTML content before rendering */}
               <div
                 className={`text-sm ${color.text} opacity-70 line-clamp-4`}
                 dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(note.content) }}
@@ -131,9 +136,35 @@ function Dashboard() {
           </p>
           <button
             type="button"
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-100 text-gray-900 font-medium text-sm mb-1"
+            onClick={() => setView('all')}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-sm mb-1 transition-colors ${
+              view === 'all'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-500 hover:bg-gray-50'
+            }`}
           >
-            📄 All Notes
+            <FileText className="w-4 h-4" />
+            All Notes
+          </button>
+          <button
+            type="button"
+            onClick={() => setView('pinned')}
+            className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-sm mb-1 transition-colors ${
+              view === 'pinned'
+                ? 'bg-gray-100 text-gray-900'
+                : 'text-gray-500 hover:bg-gray-50'
+            }`}
+          >
+            <Pin className="w-4 h-4" />
+            Pinned Notes
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/settings')}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg font-medium text-sm mb-1 text-gray-500 hover:bg-gray-50 transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            Settings
           </button>
         </nav>
 
@@ -149,8 +180,9 @@ function Dashboard() {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full text-sm font-medium text-gray-500 hover:text-gray-900 border border-gray-200 px-3 py-2 rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 border border-gray-200 px-3 py-2 rounded-lg transition-colors"
           >
+            <LogOut className="w-4 h-4" />
             Logout
           </button>
         </div>
@@ -159,14 +191,14 @@ function Dashboard() {
       <main className="flex-1 p-8">
         <div className="flex justify-between items-center mb-6 gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">All Notes</h2>
-            <p className="text-sm text-gray-500">{notes.length} notes</p>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {view === 'pinned' ? 'Pinned Notes' : 'All Notes'}
+            </h2>
+            <p className="text-sm text-gray-500">{filteredNotes.length} notes</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                🔍
-              </span>
+              <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 value={search}
@@ -178,9 +210,10 @@ function Dashboard() {
             <button
               type="button"
               onClick={() => navigate('/notes/new')}
-              className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm"
+              className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors shadow-sm flex items-center gap-2"
             >
-              + New Note
+              <Plus className="w-4 h-4" />
+              New Note
             </button>
           </div>
         </div>
