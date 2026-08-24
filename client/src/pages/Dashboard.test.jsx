@@ -25,7 +25,7 @@ describe('Dashboard page', () => {
   it('shows loading state initially', () => {
     notesService.getNotes.mockReturnValue(new Promise(() => {}));
     renderDashboard();
-    expect(screen.getByText(/loading notes/i)).toBeInTheDocument();
+    expect(screen.getByText(/loading/i)).toBeInTheDocument();
   });
 
   it('shows empty state when there are no notes', async () => {

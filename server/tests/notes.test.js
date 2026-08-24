@@ -16,17 +16,19 @@ describe('Notes API', () => {
 
   let token;
   let noteId;
+  let testUserId;
 
-  before(async () => {
-    const res = await request(app).post('/api/auth/signup').send(testUser);
-    token = res.body.token;
-  });
+before(async () => {
+  const res = await request(app).post('/api/auth/signup').send(testUser);
+  token = res.body.token;
+  testUserId = res.body.user.id;
+});
 
-  after(async () => {
-    await Note.deleteMany({});
-    await User.deleteOne({ email: testUser.email });
-    // await mongoose.connection.close();
-  });
+
+after(async () => {
+  await Note.deleteMany({ user: testUserId });
+  await User.deleteOne({ email: testUser.email });
+});
 
   describe('POST /api/notes', () => {
     it('should create a note when authenticated', async () => {
@@ -104,22 +106,62 @@ describe('Notes API', () => {
     });
   });
 
-  describe('DELETE /api/notes/:id', () => {
-    it('should delete a note', async () => {
-      const res = await request(app)
-        .delete(`/api/notes/${noteId}`)
-        .set('Authorization', `Bearer ${token}`);
+describe('DELETE /api/notes/:id', () => {
+  it('should move a note to trash', async () => {
+    const res = await request(app)
+      .delete(`/api/notes/${noteId}`)
+      .set('Authorization', `Bearer ${token}`);
 
-      expect(res.status).to.equal(200);
-      expect(res.body.message).to.equal('Note deleted successfully');
-    });
+    expect(res.status).to.equal(200);
+    expect(res.body.message).to.equal('Note moved to trash');
+  });
 
-    it('should return 404 when getting the deleted note', async () => {
-      const res = await request(app)
-        .get(`/api/notes/${noteId}`)
-        .set('Authorization', `Bearer ${token}`);
+  it('should not return the deleted note in the normal notes list', async () => {
+    const res = await request(app)
+      .get('/api/notes')
+      .set('Authorization', `Bearer ${token}`);
 
-      expect(res.status).to.equal(404);
+    const found = res.body.find((note) => note._id === noteId);
+    expect(found).to.be.undefined;
+  });
+
+  it('should appear in the trash', async () => {
+    const res = await request(app)
+      .get('/api/notes/trash')
+      .set('Authorization', `Bearer ${token}`);
+
+    const found = res.body.find((note) => note._id === noteId);
+    expect(found).to.exist;
+  });
+
+  it('should restore a note from trash', async () => {
+    const res = await request(app)
+      .patch(`/api/notes/${noteId}/restore`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).to.equal(200);
+    expect(res.body.isDeleted).to.equal(false);
+  });
+
+  it('should permanently delete a note', async () => {
+    await request(app)
+      .delete(`/api/notes/${noteId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    const res = await request(app)
+      .delete(`/api/notes/${noteId}/permanent`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).to.equal(200);
+    expect(res.body.message).to.equal('Note permanently deleted');
+  });
+
+  it('should return 404 when getting the permanently deleted note', async () => {
+    const res = await request(app)
+      .get(`/api/notes/${noteId}`)
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(res.status).to.equal(404);
     });
   });
 });

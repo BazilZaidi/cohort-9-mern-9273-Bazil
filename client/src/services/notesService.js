@@ -24,3 +24,23 @@ export const deleteNote = async (id) => {
   const response = await api.delete(`/notes/${id}`);
   return response.data;
 };
+
+export const togglePin = async (id) => {
+  const response = await api.patch(`/notes/${id}/pin`);
+  return response.data;
+};
+
+export const getTrash = async () => {
+  const response = await api.get('/notes/trash');
+  return response.data;
+};
+
+export const restoreNote = async (id) => {
+  const response = await api.patch(`/notes/${id}/restore`);
+  return response.data;
+};
+
+export const permanentlyDeleteNote = async (id) => {
+  const response = await api.delete(`/notes/${id}/permanent`);
+  return response.data;
+};
