@@ -168,8 +168,8 @@ function Dashboard() {
           return (
             <div
               key={note._id}
-              role="button"
-              tabIndex={0}
+              role={view !== 'trash' ? 'button' : undefined}
+              tabIndex={view !== 'trash' ? 0 : undefined}
               onClick={() => view !== 'trash' && goToNote(note._id)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && e.target === e.currentTarget && view !== 'trash') {

@@ -64,13 +64,17 @@ function NoteEditor() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
-      </div>
-    );
-  }
+if (loading) {
+  return (
+    <div
+      role="status"
+      aria-label="Loading note"
+      className="min-h-screen flex items-center justify-center bg-gray-100"
+    >
+      <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+    </div>
+  );
+}
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
@@ -82,6 +86,7 @@ function NoteEditor() {
           <button
             type="button"
             onClick={() => navigate('/dashboard')}
+            aria-label="Close and return to dashboard"
             className="text-gray-400 hover:text-gray-700 transition-colors"
           >
             <X className="w-6 h-6" />
@@ -98,6 +103,7 @@ function NoteEditor() {
           Title
         </label>
         <input
+          id="note-title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -105,10 +111,11 @@ function NoteEditor() {
           className="w-full px-4 py-3.5 border border-gray-200 rounded-xl mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
         />
 
-        <label className="block text-sm font-semibold text-gray-700 mb-2">
-          Content
+        <label id="note-content-label" className="block text-sm font-semibold text-gray-700 mb-2">
+         Content
         </label>
-        <div className="border border-gray-200 rounded-xl overflow-hidden mb-8">
+        <div className="border border-gray-200 rounded-xl overflow-hidden mb-8"
+          aria-labelledby="note-content-label">
           <ReactQuill
             theme="snow"
             value={content}
