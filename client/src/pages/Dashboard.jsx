@@ -294,12 +294,24 @@ function Dashboard() {
         </nav>
 
         <div className="border-t border-gray-100 pt-4 mt-4">
-          <div className="flex items-center gap-3 px-2 mb-3">
-            <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">
-              {user?.name?.[0]?.toUpperCase()}
-            </div>
+          <button
+            type="button"
+            onClick={() => navigate('/profile')}
+            className="w-full flex items-center gap-3 px-2 py-2 mb-3 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            {user?.profilePicture ? (
+              <img
+                src={user.profilePicture}
+                alt="Profile"
+                className="w-8 h-8 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">
+                {user?.name?.[0]?.toUpperCase()}
+              </div>
+            )}
             <span className="text-sm font-medium text-gray-700 truncate">{user?.name}</span>
-          </div>
+          </button>
           <button
             type="button"
             onClick={handleLogout}

@@ -80,4 +80,69 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { signup, login };
+const MAX_IMAGE_SIZE_BYTES = 1 * 1024 * 1024; // 1MB
+
+// @route  PUT /api/auth/profile
+const updateProfile = async (req, res) => {
+  try {
+    const { name, profilePicture } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (name !== undefined) {
+      if (typeof name !== 'string' || !name.trim()) {
+        return res.status(400).json({ message: 'Name cannot be empty' });
+      }
+      user.name = name.trim();
+    }
+
+    if (profilePicture !== undefined) {
+      if (profilePicture !== null) {
+        const base64Data = profilePicture.split(',')[1] || '';
+        const sizeInBytes = Math.ceil((base64Data.length * 3) / 4);
+
+        if (sizeInBytes > MAX_IMAGE_SIZE_BYTES) {
+          return res.status(400).json({ message: 'Profile picture must be under 1MB' });
+        }
+      }
+      user.profilePicture = profilePicture;
+    }
+
+    const updatedUser = await user.save();
+
+    req.log.info({ userId: updatedUser._id }, 'Profile updated');
+
+    res.status(200).json({
+      id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      profilePicture: updatedUser.profilePicture,
+      createdAt: updatedUser.createdAt,
+    });
+  } catch (error) {
+    req.log.error(error, 'Failed to update profile');
+    res.status(500).json({ message: 'Server error while updating profile' });
+  }
+};
+
+// @route  GET /api/auth/profile
+const getProfile = async (req, res) => {
+  try {
+    res.status(200).json({
+      id: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      profilePicture: req.user.profilePicture,
+      createdAt: req.user.createdAt,
+    });
+  } catch (error) {
+    req.log.error(error, 'Failed to fetch profile');
+    res.status(500).json({ message: 'Server error while fetching profile' });
+  }
+};
+
+module.exports = { signup, login, updateProfile, getProfile };
+// module.exports = { signup, login };
