@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import { AuthProvider } from '../context/AuthContext';
+import { ThemeProvider } from '../context/ThemeContext';
 import * as notesService from '../services/notesService';
 
 jest.mock('../services/notesService');
@@ -10,9 +11,11 @@ jest.mock('../services/notesService');
 const renderDashboard = () => {
   render(
     <BrowserRouter>
-      <AuthProvider>
-        <Dashboard />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <Dashboard />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 };

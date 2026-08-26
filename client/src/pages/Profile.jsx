@@ -113,26 +113,26 @@ function Profile() {
 
   if (loading) {
     return (
-      <div role="status" aria-label="Loading profile" className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div role="status" aria-label="Loading profile" className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-950">
         <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 flex items-center justify-center p-6">
+      <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-3xl shadow-xl p-8">
         <button
           type="button"
           onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors mb-6"
+          className="flex items-center gap-2 text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to notes
         </button>
 
         {error && (
-          <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg mb-4">{error}</p>
+          <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950 px-3 py-2 rounded-lg mb-4">{error}</p>
         )}
 
         <div className="flex flex-col items-center mb-6">
@@ -141,10 +141,10 @@ function Profile() {
               <img
                 src={profile.profilePicture}
                 alt="Profile"
-                className="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
+                className="w-24 h-24 rounded-full object-cover border-4 border-gray-100 dark:border-gray-800"
               />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-gray-900 text-white flex items-center justify-center text-3xl font-semibold">
+              <div className="w-24 h-24 rounded-full bg-gray-900 dark:bg-gray-700 text-white flex items-center justify-center text-3xl font-semibold">
                 {profile?.name?.[0]?.toUpperCase()}
               </div>
             )}
@@ -153,7 +153,7 @@ function Profile() {
               onClick={() => fileInputRef.current?.click()}
               disabled={saving}
               aria-label="Change profile picture"
-              className="absolute bottom-0 right-0 bg-gray-900 text-white p-2 rounded-full hover:bg-gray-800 transition-colors disabled:opacity-50"
+              className="absolute bottom-0 right-0 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 p-2 rounded-full hover:bg-gray-800 dark:hover:bg-white transition-colors disabled:opacity-50"
             >
               <Camera className="w-4 h-4" />
             </button>
@@ -171,7 +171,7 @@ function Profile() {
               type="button"
               onClick={handleRemovePicture}
               disabled={saving}
-              className="flex items-center gap-1 text-xs text-red-500 hover:text-red-600 mt-3 disabled:opacity-50"
+              className="flex items-center gap-1 text-xs text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 mt-3 disabled:opacity-50"
             >
               <Trash2 className="w-3 h-3" />
               Remove photo
@@ -180,7 +180,7 @@ function Profile() {
         </div>
 
         <div className="mb-4">
-          <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
+          <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">
             Name
           </label>
           {editingName ? (
@@ -189,7 +189,7 @@ function Profile() {
                 type="text"
                 value={nameInput}
                 onChange={(e) => setNameInput(e.target.value)}
-                className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-gray-900"
+                className="flex-1 px-3 py-2 border border-gray-200 dark:border-gray-700 dark:bg-gray-800 dark:text-white rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-gray-900 dark:focus:ring-gray-500"
                 autoFocus
               />
               <button
@@ -197,7 +197,7 @@ function Profile() {
                 onClick={handleSaveName}
                 disabled={saving}
                 aria-label="Save name"
-                className="text-green-600 hover:text-green-700 disabled:opacity-50"
+                className="text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 disabled:opacity-50"
               >
                 <Check className="w-5 h-5" />
               </button>
@@ -209,19 +209,19 @@ function Profile() {
                   setError('');
                 }}
                 aria-label="Cancel edit"
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
           ) : (
             <div className="flex items-center justify-between">
-              <p className="text-lg font-semibold text-gray-900">{profile?.name}</p>
+              <p className="text-lg font-semibold text-gray-900 dark:text-white">{profile?.name}</p>
               <button
                 type="button"
                 onClick={() => setEditingName(true)}
                 aria-label="Edit name"
-                className="text-gray-400 hover:text-gray-700"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               >
                 <Pencil className="w-4 h-4" />
               </button>
@@ -230,14 +230,14 @@ function Profile() {
         </div>
 
         <div className="mb-6">
-          <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">
+          <label className="block text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide mb-1">
             Email
           </label>
-          <p className="text-base text-gray-700">{profile?.email}</p>
+          <p className="text-base text-gray-700 dark:text-gray-300">{profile?.email}</p>
         </div>
 
         {profile?.createdAt && (
-          <p className="text-xs text-gray-400 mb-6">
+          <p className="text-xs text-gray-400 dark:text-gray-500 mb-6">
             Member since {new Date(profile.createdAt).toLocaleDateString()}
           </p>
         )}
@@ -245,7 +245,7 @@ function Profile() {
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-900 border border-gray-200 px-4 py-2.5 rounded-lg transition-colors"
+          className="w-full flex items-center justify-center gap-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white border border-gray-200 dark:border-gray-700 px-4 py-2.5 rounded-lg transition-colors"
         >
           Logout
         </button>
