@@ -103,23 +103,6 @@ const togglePin = async (req, res) => {
   }
 };
 
-// @route  DELETE /api/notes/:id
-// const deleteNote = async (req, res) => {
-//   try {
-//     const note = await Note.findOneAndDelete({ _id: req.params.id, user: req.user._id, isDeleted: false });
-
-//     if (!note) {
-//       return res.status(404).json({ message: 'Note not found' });
-//     }
-
-//     req.log.info({ noteId: req.params.id, userId: req.user._id }, 'Note deleted');
-
-//     res.status(200).json({ message: 'Note deleted successfully' });
-//   } catch (error) {
-//     req.log.error(error, 'Failed to delete note');
-//     res.status(500).json({ message: 'Server error while deleting note' });
-//   }
-// };
 const deleteNote = async (req, res) => {
   try {
     const note = await Note.findOne({ _id: req.params.id, user: req.user._id, isDeleted: false });
