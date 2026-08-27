@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
+import { X, Save, Loader2 } from 'lucide-react';
 import { getNoteById, createNote, updateNote } from '../services/notesService';
 
 function NoteEditor() {
@@ -15,17 +16,17 @@ function NoteEditor() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-useEffect(() => {
-  setTitle('');
-  setContent('');
-  setError('');
-  if (isNewNote) {
-    setLoading(false);
-  } else {
-    setLoading(true);
-    fetchNote();
-  }
-}, [id]);
+  useEffect(() => {
+    setTitle('');
+    setContent('');
+    setError('');
+    if (isNewNote) {
+      setLoading(false);
+    } else {
+      setLoading(true);
+      fetchNote();
+    }
+  }, [id]);
 
   const fetchNote = async () => {
     try {
@@ -63,62 +64,90 @@ useEffect(() => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-500">Loading...</p>
-      </div>
-    );
-  }
+if (loading) {
+  return (
+    <div
+      role="status"
+      aria-label="Loading note"
+      className="min-h-screen flex items-center justify-center bg-gray-100"
+    >
+      <Loader2 className="w-6 h-6 text-gray-400 animate-spin" />
+    </div>
+  );
+}
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-100 px-6 py-4 flex justify-between items-center">
-        <h1 className="text-lg font-semibold text-gray-900">
-          {isNewNote ? 'New Note' : 'Edit Note'}
-        </h1>
-        <div className="flex gap-3">
-          <button type="button"
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <div className="w-full max-w-3xl bg-white rounded-3xl shadow-xl p-10 note-editor-card">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isNewNote ? 'Create Note' : 'Edit Note'}
+          </h1>
+          <button
+            type="button"
             onClick={() => navigate('/dashboard')}
-            className="text-sm font-medium text-gray-600 hover:text-gray-900 border border-gray-300 px-4 py-2 rounded-lg transition-colors"
+            aria-label="Close and return to dashboard"
+            className="text-gray-400 hover:text-gray-700 transition-colors"
           >
-            Cancel
-          </button>
-          <button type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save'}
+            <X className="w-6 h-6" />
           </button>
         </div>
-      </header>
 
-      <main className="max-w-3xl mx-auto p-6">
         {error && (
           <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg mb-4">
             {error}
           </p>
         )}
 
+        <label className="block text-sm font-semibold text-gray-700 mb-2">
+          Title
+        </label>
         <input
+          id="note-title"
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Note title..."
-          className="w-full text-2xl font-semibold text-gray-900 mb-4 px-2 py-1 border-none focus:outline-none focus:ring-2 focus:ring-gray-900 rounded-lg bg-transparent"
+          placeholder="Enter note title..."
+          className="w-full px-4 py-3.5 border border-gray-200 rounded-xl mb-6 text-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
         />
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <label id="note-content-label" className="block text-sm font-semibold text-gray-700 mb-2">
+         Content
+        </label>
+        <div className="border border-gray-200 rounded-xl overflow-hidden mb-8"
+          aria-labelledby="note-content-label">
           <ReactQuill
             theme="snow"
             value={content}
             onChange={setContent}
-            placeholder="Start writing..."
-            className="h-96"
+            placeholder="Write your note..."
+            className="min-h-[22rem]"
           />
         </div>
-      </main>
+
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => navigate('/dashboard')}
+            className="px-6 py-3 rounded-full border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="px-6 py-3 rounded-full bg-gray-900 text-white text-sm font-semibold hover:bg-gray-800 transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            {saving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            {saving ? 'Saving...' : isNewNote ? 'Create' : 'Save'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

@@ -38,7 +38,7 @@ describe('NoteEditor page', () => {
   it('renders an empty form for a new note', () => {
     renderEditor('new');
     expect(screen.getByPlaceholderText(/note title/i)).toHaveValue('');
-    expect(screen.getByText(/new note/i)).toBeInTheDocument();
+    expect(screen.getByText(/create note/i)).toBeInTheDocument();
   });
 
   it('loads an existing note into the form', async () => {
@@ -59,7 +59,7 @@ describe('NoteEditor page', () => {
     renderEditor('new');
     const user = userEvent.setup();
 
-    await user.click(screen.getByText('Save'));
+    await user.click(screen.getByRole('button', { name: /create/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/title is required/i)).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe('NoteEditor page', () => {
     const user = userEvent.setup();
 
     await user.type(screen.getByPlaceholderText(/note title/i), 'New Note');
-    await user.click(screen.getByText('Save'));
+    await user.click(screen.getByRole('button', { name: /create/i }));
 
     await waitFor(() => {
       expect(notesService.createNote).toHaveBeenCalledWith('New Note', '');

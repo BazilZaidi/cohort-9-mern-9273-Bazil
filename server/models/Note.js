@@ -11,6 +11,18 @@ const noteSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    isPinned: {
+      type: Boolean,
+      default: false,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    deletedAt: {
+      type: Date,
+      default: null,
+    },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
