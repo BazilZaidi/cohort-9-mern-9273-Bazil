@@ -1,3 +1,5 @@
+
+
 import { createContext, useState, useContext, useEffect, useMemo } from 'react';
 
 const ThemeContext = createContext();
@@ -5,7 +7,18 @@ const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
-    return saved === 'dark';
+    const isSavedDark = saved === 'dark';
+
+    // Synchronously apply class to root before React's first paint
+    if (typeof window !== 'undefined') {
+      if (isSavedDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    return isSavedDark;
   });
 
   useEffect(() => {

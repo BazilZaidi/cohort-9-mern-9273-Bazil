@@ -53,4 +53,4 @@ I skipped generic TypeScript conversion warnings since this project was intentio
 3. `QualityGate.PNG` Quality gate status, open issues, duplications, coverage
 4. `Security-hotspot.PNG` Security hotspots review status
 5. `Summary.PNG` Project summary with new/accepted issues and the failed coverage condition
-6. `Reliability.PNG` Reliablity rating and issue breakdown 
+6. `Reliability.PNG` Reliability rating and issue breakdown 

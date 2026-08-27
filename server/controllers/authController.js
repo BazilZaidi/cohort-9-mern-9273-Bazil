@@ -101,8 +101,31 @@ const updateProfile = async (req, res) => {
 
     if (profilePicture !== undefined) {
       if (profilePicture !== null) {
-        const base64Data = profilePicture.split(',')[1] || '';
-        const sizeInBytes = Math.ceil((base64Data.length * 3) / 4);
+        if (typeof profilePicture !== 'string') {
+          return res.status(400).json({ message: 'Profile picture must be a valid data URL string' });
+        }
+
+        const matches = profilePicture.match(/^data:image\/[a-zA-Z0-9\+\-\.]+;base64,(.+)$/);
+        if (!matches || matches.length < 2) {
+          return res.status(400).json({ message: 'Invalid image data URL format' });
+        }
+
+        const base64Data = matches[1];
+
+        // Check for valid base64 characters
+        if (!/^[A-Za-z0-9+/=]+$/.test(base64Data)) {
+          return res.status(400).json({ message: 'Malformed Base64 image payload' });
+        }
+
+        // Account for trailing Base64 padding
+        let paddingCount = 0;
+        if (base64Data.endsWith('==')) {
+          paddingCount = 2;
+        } else if (base64Data.endsWith('=')) {
+          paddingCount = 1;
+        }
+
+        const sizeInBytes = Math.floor((base64Data.length * 3) / 4) - paddingCount;
 
         if (sizeInBytes > MAX_IMAGE_SIZE_BYTES) {
           return res.status(400).json({ message: 'Profile picture must be under 1MB' });
@@ -145,4 +168,3 @@ const getProfile = async (req, res) => {
 };
 
 module.exports = { signup, login, updateProfile, getProfile };
-// module.exports = { signup, login };

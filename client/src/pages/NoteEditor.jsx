@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
@@ -9,6 +9,8 @@ function NoteEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
   const isNewNote = id === 'new';
+
+  const quillRef = useRef(null);
 
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -27,6 +29,15 @@ function NoteEditor() {
       fetchNote();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (!loading && quillRef.current) {
+      const editorRoot = quillRef.current.getEditor?.()?.root;
+      if (editorRoot) {
+        editorRoot.setAttribute('aria-labelledby', 'note-content-label');
+      }
+    }
+  }, [loading]);
 
   const fetchNote = async () => {
     try {
@@ -114,11 +125,9 @@ function NoteEditor() {
         <label id="note-content-label" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
           Content
         </label>
-        <div
-          className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-8"
-          aria-labelledby="note-content-label"
-        >
+        <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden mb-8">
           <ReactQuill
+            ref={quillRef}
             theme="snow"
             value={content}
             onChange={setContent}

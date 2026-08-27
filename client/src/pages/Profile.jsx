@@ -1,3 +1,5 @@
+
+
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Camera, Trash2, Pencil, Check, X, Loader2 } from 'lucide-react';
@@ -91,6 +93,9 @@ function Profile() {
         setError('Failed to upload picture');
       } finally {
         setSaving(false);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
       }
     };
     reader.readAsDataURL(file);
@@ -205,7 +210,7 @@ function Profile() {
                 type="button"
                 onClick={() => {
                   setEditingName(false);
-                  setNameInput(profile.name);
+                  setNameInput(profile?.name || '');
                   setError('');
                 }}
                 aria-label="Cancel edit"
